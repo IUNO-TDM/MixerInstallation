@@ -1,0 +1,91 @@
+{
+    "apps": [
+      {
+        "name": "MixerControl",
+        "script": "npm",
+        "args": [
+          "start"
+        ],
+        "watch": true,
+        "node_args": "",
+        "merge_logs": true,
+        "cwd": "MixerControl/MixerControl-app",
+        "exec_mode": "fork",
+        "env": {
+          "NODE_ENV": "testing",
+          "TDM_MIXER_CONFIG": "private_config_testing"
+        },
+        "env_production": {
+          "NODE_ENV": "production",
+      "TDM_MIXER_CONFIG": "private_config_production"
+        },
+        "env_dev": {
+          "NODE_ENV": "development"
+        },
+        "instances": 1
+      },
+      {
+        "name": "PumpControl",
+        "script": "./PumpControl/build/pumpcontrol.out",
+        "args": [
+          "-c","/home/mixer/pumpcontrol.settings.conf"
+        ],
+        "restart_delay": 10000,
+        "max_restarts": 6,
+        "watch": false,
+        "merge_logs": true,
+        "exec_interpreter": "none",
+        "exec_mode": "fork",
+        "cwd": "PumpControl",
+        "env": {
+        },
+        "env_dev": {
+        },
+        "env_production":{
+        },
+        "instances": 1
+      },
+      {
+        "name": "LicenseManager",
+        "script": "./LicenseManager/build/LicenseManager",
+        "args": [
+          ""
+        ],
+        "watch": false,
+        "merge_logs": true,
+        "restart_delay": 10000,
+        "max_restarts": 6,
+        "exec_interpreter": "none",
+        "exec_mode": "fork",
+        "cwd": "LicenseManager",
+        "env": {
+        },
+        "env_dev": {
+        },
+        "env_production":{
+        },
+        "instances": 1
+      },
+      {
+        "name": "PaymentService",
+        "script": "/usr/bin/mvn",
+        "args": [
+          "jetty:run"
+        ],
+        "restart_delay": 10000,
+        "max_restarts": 6,
+        "watch": false,
+        "merge_logs": true,
+        "exec_interpreter": "none",
+        "exec_mode": "fork",
+        "cwd": "PaymentService",
+        "env": {
+        },
+        "env_dev": {
+        },
+        "env_production":{
+        },
+        "instances": 1
+      }
+    ]
+  }
