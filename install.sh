@@ -24,7 +24,7 @@ echo "Installing / Upgrading Raspbian packages"
 echo "============================"
 sudo apt-get update
 sudo apt-get upgrade -y
-sudo apt-get install -y maven python-imaging
+sudo apt-get install -y maven python-imaging libboost-all-dev libssl-dev
 echo "Finished installing packages"
 
 echo "============================"
@@ -72,8 +72,12 @@ echo "Finished installing PIGPIO"
 echo "==================================="
 echo "Install WIBU CodeMeter User Runtime"
 echo "==================================="
+temp_folder=`mktemp -d -t iuno_temp_XXXXXXXX`
+cd $temp_folder
+wget http://wibu.com/files/iuno/codemeter_6.60.2869.500_armhf.deb
+sudo dpkg -i codemeter_6.60.2869.500_armhf.deb
 
-sudo dpkg -i /home/$mixer_user/$mixer_installation_folder/codemeter_6.50.2631.502_armhf.deb 
+sudo rm -r $temp_folder
 echo "Finished installing WIBU Codemeter User Runtime"
 
 
@@ -93,7 +97,7 @@ echo "Install MixerControl"
 echo "==================================="
 
 git clone https://github.com/IUNO-TDM/MixerControl.git /home/$mixer_user/$mixer_control_folder
-pip install socketIO-client-2
+pip install socketIO-client-2 spidev
 cd /home/$mixer_user/$mixer_control_folder
 git reset --hard
 git checkout $mixer_control_branch
