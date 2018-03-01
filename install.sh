@@ -166,72 +166,91 @@ mvn clean package
 
 
 
-menu_option=$(whiptail --title "Wallet for PaymentService" --menu "The PaymentService contains a Bitcoin Wallet to store the Bitcoins earned at your machine." 25 78 16 "1" "I have the wallet seed and want to enter it" "2" "I don't have a wallet yet. Let's create one" --nocancel  3>&1 1>&2 2>&3)
+#check if there is an existing wallet file or a backup file 
 
-if [ $menu_option = "1"]
+if [ -e /home/$mixer_user/.PaymentService/PaymentService.wallet ]
 then
- mnemonics=$(whiptail --inputbox "Enter the mnemonic (e.g. \"never,use,this,seed,never,use,this,seed,never,use,this,seed\")" 8 100  --title "Enter Wallet Seed" 3>&1 1>&2 2>&3)
- creationtime=$(whiptail --inputbox "enter the creation time (e.g. 1504199300)" 8 100  --title "Enter Wallet Seed" 3>&1 1>&2 2>&3)
+    echo "There is already a wallet. Won't initialize a new one."
 else
-    wallet_init_res=`mvn -q clean package exec:java -Dexec.mainClass=iuno.tdm.paymentservice.init.WalletInitializer -Dexec.args=generate`
-    readarray -t lines <<< "$wallet_init_res"
+    menu_option=$(whiptail --title "Wallet for PaymentService" --menu "The PaymentService contains a Bitcoin Wallet to store the Bitcoins earned at your machine." 25 78 16 "1" "I have the wallet seed and want to enter it" "2" "I don't have a wallet yet. Let's create one" --nocancel  3>&1 1>&2 2>&3)
 
-    mnemonics=$(echo ${lines[0]} | sed 's/[[:space:]]//g')
+    if [ $menu_option = "1"]
+    then
+     mnemonics=$(whiptail --inputbox "Enter the mnemonic (e.g. \"never,use,this,seed,never,use,this,seed,never,use,this,seed\")" 8 100  --title "Enter Wallet Seed" 3>&1 1>&2 2>&3)
+     creationtime=$(whiptail --inputbox "enter the creation time (e.g. 1504199300)" 8 100  --title "Enter Wallet Seed" 3>&1 1>&2 2>&3)
+    else
+        wallet_init_res=`mvn -q clean package exec:java -Dexec.mainClass=iuno.tdm.paymentservice.init.WalletInitializer -Dexec.args=seed`
+        readarray -t lines <<< "$wallet_init_res"
 
-    creationtime=${lines[1]}
+        mnemonics=$(echo ${lines[0]} | sed 's/[[:space:]]//g')
 
-    echo "the wallet mnemonic: $mnemonics"
-    echo "the wallet creation time: $creationtime"
+        creationtime=${lines[1]}
 
-    showcode() {
-        whiptail --title "Write down your seed!" --msgbox "You have to backup your seed (mnemonic and creationtime):\
-    \n\n$mnemonics\nCreation Time: $creationtime\n\nTake a sheet of paper, write the mnemonic and creationtime down!" 10 100
-    }
-    showcode
-    while  ! (whiptail --title "Are you sure???" --yesno "Are you sure you did wrote down your mnemonic and creationtime?" 8 100) 
-    do
+        echo "the wallet mnemonic: $mnemonics"
+        echo "the wallet creation time: $creationtime"
+
+        showcode() {
+            whiptail --title "Write down your seed!" --msgbox "You have to backup your seed (mnemonic and creationtime):\
+        \n\n$mnemonics\nCreation Time: $creationtime\n\nTake a sheet of paper, write the mnemonic and creationtime down!" 10 100
+        }
         showcode
-    done   
+        while  ! (whiptail --title "Are you sure???" --yesno "Are you sure you did wrote down your mnemonic and creationtime?" 8 100) 
+        do
+            showcode
+        done   
 
-    getMnemonic() {
-        mn=$(whiptail --inputbox "Please enter the mnemonic you wrote down before. (Format:  \"never,use,this,seed,never,use,this,seed,never,use,this,seed\")" 10 100 --title "Mnemonic check"  3>&1 1>&2 2>&3)
-        echo $mn | sed 's/[[:space:]]//g' 
-    }
+        getMnemonic() {
+            mn=$(whiptail --inputbox "Please enter the mnemonic you wrote down before. (Format:  \"never,use,this,seed,never,use,this,seed,never,use,this,seed\")" 10 100 --title "Mnemonic check"  3>&1 1>&2 2>&3)
+            echo $mn | sed 's/[[:space:]]//g' 
+        }
 
-    while [ "$mnemonics" != "$(getMnemonic)" ]
-    do
-        whiptail --msgbox "You entered the wrong mnemonic" 10 100 --title "Wrong mnemonic"
-        showcode
-    done
+        while [ "$mnemonics" != "$(getMnemonic)" ]
+        do
+            whiptail --msgbox "You entered the wrong mnemonic" 10 100 --title "Wrong mnemonic"
+            showcode
+        done
 
-    getCreationTime() {
-        ct=$(whiptail --inputbox "Please enter the creation time you wrote down before. (Format:  \"1504199300\")" 10 100 --title "CreationTime check"  3>&1 1>&2 2>&3)
-        echo $ct | sed 's/[[:space:]]//g' 
-    }
+        getCreationTime() {
+            ct=$(whiptail --inputbox "Please enter the creation time you wrote down before. (Format:  \"1504199300\")" 10 100 --title "CreationTime check"  3>&1 1>&2 2>&3)
+            echo $ct | sed 's/[[:space:]]//g' 
+        }
 
-    while [ "$creationtime" != "$(getCreationTime)" ]
-    do
-        whiptail --msgbox "You entered the wrong creation time" 10 100 --title "Wrong creation time"
-        showcode
-    done
+        while [ "$creationtime" != "$(getCreationTime)" ]
+        do
+            whiptail --msgbox "You entered the wrong creation time" 10 100 --title "Wrong creation time"
+            showcode
+        done
+
+
+        mvn -q clean package exex:java -Dexec.mainClass=iuno.tdm.paymentservice.init.WalletInitializer -Dexec.args="generate $mnemonics $creationtime"
+
+
+        echo "Patching payment service configuration..."
+        reg_string="<walletSeed>.*<\/walletSeed>"
+        seed_string="<walletSeed>$mnemonics<\/walletSeed>"
+
+        reg_string2="<walletCreationTime>.*<\/walletCreationTime>"
+        ct_string="<walletCreationTime>$creationtime<\/walletCreationTime>"
+        echo s/$reg_string/$seed_string/g > myscript.sed
+        echo s/$reg_string2/$ct_string/g >> myscript.sed
+
+        sed -f myscript.sed -i /home/$mixer_user/$payment_service_folder/pom.xml
+        rm myscript.sed
 
 
 
+    fi
 fi
+#if there is none, create a walletseed
+
+#then start paymentservice with walletseed parameter and shutdown parameter
 
 
 
-echo "Patching payment service configuration..."
-reg_string="<walletSeed>.*<\/walletSeed>"
-seed_string="<walletSeed>$mnemonics<\/walletSeed>"
 
-reg_string2="<walletCreationTime>.*<\/walletCreationTime>"
-ct_string="<walletCreationTime>$creationtime<\/walletCreationTime>"
-echo s/$reg_string/$seed_string/g > myscript.sed
-echo s/$reg_string2/$ct_string/g >> myscript.sed
 
-sed -f myscript.sed -i /home/$mixer_user/$payment_service_folder/pom.xml
-rm myscript.sed
+
+
 
 echo "Finished installing Payment Service"
 
