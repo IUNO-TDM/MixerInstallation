@@ -41,7 +41,8 @@ echo "Finished installing nvm, node, pm2"
 echo "============================"
 echo "Clone installation files"
 echo "============================"
-git clone git clone https://github.com/IUNO-TDM/MixerInstallation.git /home/$mixer_user/$mixer_installation_folder
+cd /home/$mixer_user
+git clone https://github.com/IUNO-TDM/MixerInstallation.git /home/$mixer_user/$mixer_installation_folder
 cd /home/$mixer_user/$mixer_installation_folder
 git reset --hard
 git checkout $mixer_installation_branch
@@ -84,7 +85,7 @@ echo "Finished installing WIBU Codemeter User Runtime"
 echo "==================================="
 echo "Install license manager"
 echo "==================================="
-
+cd /home/$mixer_user
 git clone https://github.com/IUNO-TDM/LicenseManager.git /home/$mixer_user/$license_manager_folder
 cd /home/$mixer_user/$license_manager_folder
 git reset --hard
@@ -95,7 +96,7 @@ echo "Finished installing License Manager"
 echo "==================================="
 echo "Install MixerControl"
 echo "==================================="
-
+cd /home/$mixer_user
 git clone https://github.com/IUNO-TDM/MixerControl.git /home/$mixer_user/$mixer_control_folder
 pip install socketIO-client-2 spidev
 cd /home/$mixer_user/$mixer_control_folder
@@ -153,10 +154,12 @@ else
 fi
 
 
+
 echo "==================================="
 echo "Install Payment Service"
 echo "==================================="s
 
+cd /home/$mixer_user
 git clone https://github.com/IUNO-TDM/PaymentService.git /home/$mixer_user/$payment_service_folder
 cd /home/$mixer_user/$payment_service_folder
 git reset --hard
@@ -172,9 +175,9 @@ if [ -e /home/$mixer_user/.PaymentService/PaymentService.wallet ]
 then
     echo "There is already a wallet. Won't initialize a new one."
 else
-    menu_option=$(whiptail --title "Wallet for PaymentService" --menu "The PaymentService contains a Bitcoin Wallet to store the Bitcoins earned at your machine." 25 78 16 "1" "I have the wallet seed and want to enter it" "2" "I don't have a wallet yet. Let's create one" --nocancel  3>&1 1>&2 2>&3)
+    menu_option=$(whiptail --title "Wallet for PaymentService" --menu "The PaymentService contains a Bitcoin Wallet to store the Bitcoins earned at your machine." 25 78 16 "1" "I don't have a wallet yet. Let's create one" "2" "I have the wallet seed and want to enter it" --nocancel  3>&1 1>&2 2>&3)
 
-    if [ $menu_option = "1"]
+    if [ $menu_option = "2" ]
     then
      mnemonics=$(whiptail --inputbox "Enter the mnemonic (e.g. \"never,use,this,seed,never,use,this,seed,never,use,this,seed\")" 8 100  --title "Enter Wallet Seed" 3>&1 1>&2 2>&3)
      creationtime=$(whiptail --inputbox "enter the creation time (e.g. 1504199300)" 8 100  --title "Enter Wallet Seed" 3>&1 1>&2 2>&3)
@@ -219,27 +222,9 @@ else
         do
             whiptail --msgbox "You entered the wrong creation time" 10 100 --title "Wrong creation time"
             showcode
-        done
-
-
-        mvn -q clean package exex:java -Dexec.mainClass=iuno.tdm.paymentservice.init.WalletInitializer -Dexec.args="generate $mnemonics $creationtime"
-
-
-        echo "Patching payment service configuration..."
-        reg_string="<walletSeed>.*<\/walletSeed>"
-        seed_string="<walletSeed>$mnemonics<\/walletSeed>"
-
-        reg_string2="<walletCreationTime>.*<\/walletCreationTime>"
-        ct_string="<walletCreationTime>$creationtime<\/walletCreationTime>"
-        echo s/$reg_string/$seed_string/g > myscript.sed
-        echo s/$reg_string2/$ct_string/g >> myscript.sed
-
-        sed -f myscript.sed -i /home/$mixer_user/$payment_service_folder/pom.xml
-        rm myscript.sed
-
-
-
+        done    
     fi
+    mvn -q clean package exec:java -Dexec.mainClass=iuno.tdm.paymentservice.init.WalletInitializer -Dexec.args="generate $mnemonics $creationtime"
 fi
 #if there is none, create a walletseed
 
@@ -267,7 +252,7 @@ echo "==================================="
 echo "Patch /boot/config.txt for SPI1"
 echo "==================================="
 
-bash /home/$mixer_user/$mixer_installation_folder/homeactivateSPI1.sh
+bash /home/$mixer_user/$mixer_installation_folder/activateSPI1.sh
 
 echo "*****************************************************************************"
 echo "*A Reboot is required. Otherwise the PumpControl and Illumination wont work!*"
