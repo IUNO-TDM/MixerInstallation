@@ -50,109 +50,6 @@ git pull origin $mixer_installation_branch
 
 echo "Finished cloning installation files"
 
-#read
-
-
-
-
-echo "================================================"
-echo "Installing PIGPIO - a dependency for PumpControl"
-echo "================================================"
-
-temp_folder=`mktemp -d -t iuno_temp_XXXXXXXX`
-cd $temp_folder
-wget abyz.co.uk/rpi/pigpio/pigpio.zip
-unzip pigpio.zip
-cd PIGPIO
-make
-sudo make install
-sudo rm -r $temp_folder
-
-echo "Finished installing PIGPIO"
-
-echo "==================================="
-echo "Install WIBU CodeMeter User Runtime"
-echo "==================================="
-temp_folder=`mktemp -d -t iuno_temp_XXXXXXXX`
-cd $temp_folder
-wget http://wibu.com/files/iuno/codemeter_6.60.2869.500_armhf.deb
-sudo dpkg -i codemeter_6.60.2869.500_armhf.deb
-
-sudo rm -r $temp_folder
-echo "Finished installing WIBU Codemeter User Runtime"
-
-
-echo "==================================="
-echo "Install license manager"
-echo "==================================="
-cd /home/$mixer_user
-git clone https://github.com/IUNO-TDM/LicenseManager.git /home/$mixer_user/$license_manager_folder
-cd /home/$mixer_user/$license_manager_folder
-git reset --hard
-git checkout $license_manager_branch
-git pull origin $license_manager_branch
-echo "Finished installing License Manager"
-
-echo "==================================="
-echo "Install MixerControl"
-echo "==================================="
-cd /home/$mixer_user
-git clone https://github.com/IUNO-TDM/MixerControl.git /home/$mixer_user/$mixer_control_folder
-pip install socketIO-client-2 spidev
-cd /home/$mixer_user/$mixer_control_folder
-git reset --hard
-git checkout $mixer_control_branch
-git pull origin $mixer_control_branch
-cp /home/$mixer_user/$mixer_installation_folder/private_config_production.js /home/$mixer_user/$mixer_control_folder/MixerControl-app/config/private_config_production.js
-cp /home/$mixer_user/$mixer_installation_folder/private_config_testing.js /home/$mixer_user/$mixer_control_folder/MixerControl-app/config/private_config_testing.js
-
-
-mixer_user_name=$(whiptail --inputbox "Please enter the Username for this machine at the marketplace:" 8 100 --title "Configuring MixerControl" --nocancel 3>&1 1>&2 2>&3)
-mixer_user_password=$(whiptail --inputbox "and now the Password for this machine at the marketplace:" 8 100 --title "Configuring MixerControl" --nocancel 3>&1 1>&2 2>&3)
-mixer_retail_price=$(whiptail --inputbox "Enter the standard price for drinks at this machine:" 8 100 2 --title "Configuring MixerControl" --nocancel 3>&1 1>&2 2>&3)
-
-
-echo s/replace_user_name/$mixer_user_name/g > myscript.sed
-echo s/replace_user_password/$mixer_user_password/g >> myscript.sed
-echo s/replace_retail_price/$mixer_retail_price/g >> myscript.sed
-
-sed -f myscript.sed -i /home/$mixer_user/$mixer_control_folder/MixerControl-app/config/private_config_production.js
-rm myscript.sed
-cd /home/$mixer_user/$mixer_control_folder/MixerControl-app
-npm install
-npm install -g @angular/cli
-ng build --env=prod
-
-echo "Finished installing MixerControl"
-
-echo "==================================="
-echo "Install PumpControl"
-echo "==================================="
-
-cd /home/$mixer_user
-mkdir -p $pump_control_folder
-cp /home/$mixer_user/$mixer_installation_folder/pumpcontrol.out /home/$mixer_user/$pump_control_folder
-echo "Finished installing PumpControl"
-
-echo "==================================="
-echo "Install Oracle Java 8 JDK"
-echo "==================================="
-java_version="$(java -version 2>&1)"
-if [[  $java_version =~ 1.8.0_151 ]]
-then
-    echo "java version is up to date"
-else
-    temp_folder=`mktemp -d -t iuno_temp_XXXXXXXX`
-    cd $temp_folder
-    wget --no-check-certificate -c --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u151-b12/e758a0de34e24606bca991d704f6dcbf/jdk-8u151-linux-arm32-vfp-hflt.tar.gz
-
-    sudo mkdir -p /opt/jdk
-    sudo tar -xzf jdk-8u151-linux-arm32-vfp-hflt.tar.gz -C /opt/jdk
-    sudo update-alternatives --install /usr/bin/javac javac /opt/jdk/jdk1.8.0_151/bin/javac 400
-    sudo update-alternatives --install /usr/bin/java java /opt/jdk/jdk1.8.0_151/bin/java 400
-    echo "Finished installing Oracle Java 8 JDK"
-fi
-
 
 
 echo "==================================="
@@ -226,18 +123,111 @@ else
     fi
     mvn -q clean package exec:java -Dexec.mainClass=iuno.tdm.paymentservice.init.WalletInitializer -Dexec.args="generate $mnemonics $creationtime"
 fi
-#if there is none, create a walletseed
-
-#then start paymentservice with walletseed parameter and shutdown parameter
-
-
-
-
-
-
-
 
 echo "Finished installing Payment Service"
+
+echo "==================================="
+echo "Install MixerControl"
+echo "==================================="
+cd /home/$mixer_user
+git clone https://github.com/IUNO-TDM/MixerControl.git /home/$mixer_user/$mixer_control_folder
+pip install socketIO-client-2 spidev
+cd /home/$mixer_user/$mixer_control_folder
+git reset --hard
+git checkout $mixer_control_branch
+git pull origin $mixer_control_branch
+cp /home/$mixer_user/$mixer_installation_folder/private_config_production.js /home/$mixer_user/$mixer_control_folder/MixerControl-app/config/private_config_production.js
+cp /home/$mixer_user/$mixer_installation_folder/private_config_testing.js /home/$mixer_user/$mixer_control_folder/MixerControl-app/config/private_config_testing.js
+
+
+mixer_user_name=$(whiptail --inputbox "Please enter the Username for this machine at the marketplace:" 8 100 --title "Configuring MixerControl" --nocancel 3>&1 1>&2 2>&3)
+mixer_user_password=$(whiptail --inputbox "and now the Password for this machine at the marketplace:" 8 100 --title "Configuring MixerControl" --nocancel 3>&1 1>&2 2>&3)
+mixer_retail_price=$(whiptail --inputbox "Enter the standard price for drinks at this machine:" 8 100 2 --title "Configuring MixerControl" --nocancel 3>&1 1>&2 2>&3)
+
+
+echo s/replace_user_name/$mixer_user_name/g > myscript.sed
+echo s/replace_user_password/$mixer_user_password/g >> myscript.sed
+echo s/replace_retail_price/$mixer_retail_price/g >> myscript.sed
+
+sed -f myscript.sed -i /home/$mixer_user/$mixer_control_folder/MixerControl-app/config/private_config_production.js
+rm myscript.sed
+cd /home/$mixer_user/$mixer_control_folder/MixerControl-app
+npm install
+npm install -g @angular/cli
+ng build --env=prod
+
+echo "Finished installing MixerControl"
+
+
+
+echo "================================================"
+echo "Installing PIGPIO - a dependency for PumpControl"
+echo "================================================"
+
+temp_folder=`mktemp -d -t iuno_temp_XXXXXXXX`
+cd $temp_folder
+wget abyz.co.uk/rpi/pigpio/pigpio.zip
+unzip pigpio.zip
+cd PIGPIO
+make
+sudo make install
+sudo rm -r $temp_folder
+
+echo "Finished installing PIGPIO"
+
+echo "==================================="
+echo "Install WIBU CodeMeter User Runtime"
+echo "==================================="
+temp_folder=`mktemp -d -t iuno_temp_XXXXXXXX`
+cd $temp_folder
+wget http://wibu.com/files/iuno/codemeter_6.60.2869.500_armhf.deb
+sudo dpkg -i codemeter_6.60.2869.500_armhf.deb
+
+sudo rm -r $temp_folder
+echo "Finished installing WIBU Codemeter User Runtime"
+
+
+echo "==================================="
+echo "Install license manager"
+echo "==================================="
+cd /home/$mixer_user
+git clone https://github.com/IUNO-TDM/LicenseManager.git /home/$mixer_user/$license_manager_folder
+cd /home/$mixer_user/$license_manager_folder
+git reset --hard
+git checkout $license_manager_branch
+git pull origin $license_manager_branch
+echo "Finished installing License Manager"
+
+echo "==================================="
+echo "Install PumpControl"
+echo "==================================="
+
+cd /home/$mixer_user
+mkdir -p $pump_control_folder
+cp /home/$mixer_user/$mixer_installation_folder/pumpcontrol.out /home/$mixer_user/$pump_control_folder
+echo "Finished installing PumpControl"
+
+echo "==================================="
+echo "Install Oracle Java 8 JDK"
+echo "==================================="
+java_version="$(java -version 2>&1)"
+if [[  $java_version =~ 1.8.0_151 ]]
+then
+    echo "java version is up to date"
+else
+    temp_folder=`mktemp -d -t iuno_temp_XXXXXXXX`
+    cd $temp_folder
+    wget --no-check-certificate -c --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u151-b12/e758a0de34e24606bca991d704f6dcbf/jdk-8u151-linux-arm32-vfp-hflt.tar.gz
+
+    sudo mkdir -p /opt/jdk
+    sudo tar -xzf jdk-8u151-linux-arm32-vfp-hflt.tar.gz -C /opt/jdk
+    sudo update-alternatives --install /usr/bin/javac javac /opt/jdk/jdk1.8.0_151/bin/javac 400
+    sudo update-alternatives --install /usr/bin/java java /opt/jdk/jdk1.8.0_151/bin/java 400
+    echo "Finished installing Oracle Java 8 JDK"
+fi
+
+
+
 
 echo "==================================="
 echo "Initialize PM2"
