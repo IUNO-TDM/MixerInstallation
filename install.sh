@@ -235,12 +235,13 @@ cd /home/$mixer_user
 
 cp /home/$mixer_user/$mixer_installation_folder/pm2_mixer.json /home/$mixer_user/pm2_mixer.json 
 cp /home/$mixer_user/$mixer_installation_folder/start_env_production.sh /home/$mixer_user/start_env_production.sh
+chmod a+x /home/$mixer_user/start_env_production.sh
 
 echo "==================================="
 echo "Patch /boot/config.txt for SPI1"
 echo "==================================="
 
-bash /home/$mixer_user/$mixer_installation_folder/activateSPI1.sh
+sudo bash /home/$mixer_user/$mixer_installation_folder/activateSPI1.sh
 
 echo "*****************************************************************************"
 echo "*A Reboot is required. Otherwise the PumpControl and Illumination wont work!*"
