@@ -140,8 +140,8 @@ cp /home/$mixer_user/$mixer_installation_folder/private_config_production.js /ho
 cp /home/$mixer_user/$mixer_installation_folder/private_config_testing.js /home/$mixer_user/$mixer_control_folder/MixerControl-app/config/private_config_testing.js
 
 
-mixer_user_name=$(whiptail --inputbox "Please enter the Username for this machine at the marketplace:" 8 100 --title "Configuring MixerControl" --nocancel 3>&1 1>&2 2>&3)
-mixer_user_password=$(whiptail --inputbox "and now the Password for this machine at the marketplace:" 8 100 --title "Configuring MixerControl" --nocancel 3>&1 1>&2 2>&3)
+mixer_user_name=$(whiptail --inputbox "Please enter the client_id for this machine at the marketplace:" 8 100 --title "Configuring MixerControl" --nocancel 3>&1 1>&2 2>&3)
+mixer_user_password=$(whiptail --inputbox "and now the client_secret for this machine at the marketplace:" 8 100 --title "Configuring MixerControl" --nocancel 3>&1 1>&2 2>&3)
 mixer_retail_price=$(whiptail --inputbox "Enter the standard price for drinks at this machine:" 8 100 2 --title "Configuring MixerControl" --nocancel 3>&1 1>&2 2>&3)
 
 
@@ -154,7 +154,7 @@ rm myscript.sed
 cd /home/$mixer_user/$mixer_control_folder/MixerControl-app
 npm install
 npm install -g @angular/cli
-ng build --env=prod
+npm run build
 
 echo "Finished installing MixerControl"
 
@@ -190,13 +190,11 @@ echo "Finished installing WIBU Codemeter User Runtime"
 echo "==================================="
 echo "Install license manager"
 echo "==================================="
+
 cd /home/$mixer_user
-git clone https://github.com/IUNO-TDM/LicenseManager.git /home/$mixer_user/$license_manager_folder
-cd /home/$mixer_user/$license_manager_folder
-git reset --hard
-git checkout $license_manager_branch
-git pull origin $license_manager_branch
-echo "Finished installing License Manager"
+mkdir -p $license_manager_folder
+cp /home/$mixer_user/$mixer_installation_folder/LicenseManager /home/$mixer_user/$license_manager_folder
+echo "Finished installing LicenseManager"
 
 echo "==================================="
 echo "Install PumpControl"
@@ -211,18 +209,18 @@ echo "==================================="
 echo "Install Oracle Java 8 JDK"
 echo "==================================="
 java_version="$(java -version 2>&1)"
-if [[  $java_version =~ 1.8.0_151 ]]
+if [[  $java_version =~ 1.8.0_162 ]]
 then
     echo "java version is up to date"
 else
     temp_folder=`mktemp -d -t iuno_temp_XXXXXXXX`
     cd $temp_folder
-    wget --no-check-certificate -c --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u151-b12/e758a0de34e24606bca991d704f6dcbf/jdk-8u151-linux-arm32-vfp-hflt.tar.gz
+    wget --no-check-certificate -c --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u162-b12/0da788060d494f5095bf8624735fa2f1/jdk-8u162-linux-arm32-vfp-hflt.tar.gz
 
     sudo mkdir -p /opt/jdk
-    sudo tar -xzf jdk-8u151-linux-arm32-vfp-hflt.tar.gz -C /opt/jdk
-    sudo update-alternatives --install /usr/bin/javac javac /opt/jdk/jdk1.8.0_151/bin/javac 400
-    sudo update-alternatives --install /usr/bin/java java /opt/jdk/jdk1.8.0_151/bin/java 400
+    sudo tar -xzf jdk-8u162-linux-arm32-vfp-hflt.tar.gz -C /opt/jdk
+    sudo update-alternatives --install /usr/bin/javac javac /opt/jdk/jdk1.8.0_162/bin/javac 400
+    sudo update-alternatives --install /usr/bin/java java /opt/jdk/jdk1.8.0_162/bin/java 400
     echo "Finished installing Oracle Java 8 JDK"
 fi
 
