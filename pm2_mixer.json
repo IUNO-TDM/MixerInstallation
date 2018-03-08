@@ -26,9 +26,9 @@
       },
       {
         "name": "PumpControl",
-        "script": "./PumpControl/build/pumpcontrol.out",
+        "script": "./PumpControl/pumpcontrol.out",
         "args": [
-          "-c","/home/mixer/pumpcontrol.settings.conf"
+          "-c","/home/pi/pumpcontrol.settings.conf"
         ],
         "restart_delay": 10000,
         "max_restarts": 6,
@@ -47,7 +47,7 @@
       },
       {
         "name": "LicenseManager",
-        "script": "./LicenseManager/build/LicenseManager",
+        "script": "./LicenseManager/LicenseManager",
         "args": [
           ""
         ],

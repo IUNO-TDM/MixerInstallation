@@ -8,7 +8,7 @@ license_manager_folder="LicenseManager"
 license_manager_branch="master"
 
 mixer_control_folder="MixerControl"
-mixer_control_branch="stable"
+mixer_control_branch="master"
 
 pump_control_folder="PumpControl"
 
@@ -203,6 +203,12 @@ echo "==================================="
 cd /home/$mixer_user
 mkdir -p $pump_control_folder
 cp /home/$mixer_user/$mixer_installation_folder/pumpcontrol.out /home/$mixer_user/$pump_control_folder
+cp /home/$mixer_user/$mixer_installation_folder/pumpcontrol.settings.conf /hom/$mixer_user/pumpcontrol.settings.conf
+cd /home/$mixer_user/$pump_control_folder
+sudo chown root pumpcontrol.out 
+sudo chgrp kmem pumpcontrol.out 
+sudo chmod ug+s pumpcontrol.out 
+
 echo "Finished installing PumpControl"
 
 echo "==================================="

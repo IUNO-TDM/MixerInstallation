@@ -1,4 +1,4 @@
-
+const self = {};
 self.DATABASE_NAME = 'MIXERCONTROL_DB';
 self.LOG_LEVEL = 'info';
 self.HOST_SETTINGS = {
