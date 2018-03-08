@@ -86,6 +86,27 @@
         "env_production":{
         },
         "instances": 1
-      }
+      },
+      {
+      "name": "Illumination",
+      "script": "./MixerControl/Illumination/main.py",
+      "args": [
+
+      ],
+      "restart_delay": 10000,
+      "max_restarts": 6,
+      "watch": false,
+      "merge_logs": true,
+      "exec_interpreter": "none",
+      "exec_mode": "fork",
+      "cwd": "MixerControl/Illumination",
+      "env": {
+      },
+      "env_dev": {
+      },
+      "env_production": {
+      },
+      "instances": 1
+    }
     ]
   }
