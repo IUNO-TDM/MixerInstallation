@@ -24,7 +24,7 @@ echo "Installing / Upgrading Raspbian packages"
 echo "============================"
 sudo apt-get update
 sudo apt-get upgrade -y
-sudo apt-get install -y maven python-imaging libboost-all-dev libssl-dev
+sudo apt-get install -y maven python-imaging libboost-all-dev libssl-dev ntp vim sl nmap lolcat cowsay
 echo "Finished installing packages"
 
 echo "============================"
@@ -194,6 +194,8 @@ echo "==================================="
 cd /home/$mixer_user
 mkdir -p $license_manager_folder
 cp /home/$mixer_user/$mixer_installation_folder/LicenseManager /home/$mixer_user/$license_manager_folder
+sudo chmod a+x /home/$mixer_user/$license_manager_folder/LicenseManager
+
 echo "Finished installing LicenseManager"
 
 echo "==================================="
@@ -202,12 +204,14 @@ echo "==================================="
 
 cd /home/$mixer_user
 mkdir -p $pump_control_folder
-cp /home/$mixer_user/$mixer_installation_folder/pumpcontrol.out /home/$mixer_user/$pump_control_folder
-cp /home/$mixer_user/$mixer_installation_folder/pumpcontrol.settings.conf /hom/$mixer_user/pumpcontrol.settings.conf
+cp /home/$mixer_user/$mixer_installation_folder/PumpControl /home/$mixer_user/$pump_control_folder
+cp /home/$mixer_user/$mixer_installation_folder/pumpcontrol.settings.conf /home/$mixer_user/pumpcontrol.settings.conf
 cd /home/$mixer_user/$pump_control_folder
-sudo chown root pumpcontrol.out 
-sudo chgrp kmem pumpcontrol.out 
-sudo chmod ug+s pumpcontrol.out 
+
+sudo chmod a+x PumpControl
+sudo chown root PumpControl
+sudo chgrp kmem PumpControl
+sudo chmod ug+s PumpControl
 
 echo "Finished installing PumpControl"
 
