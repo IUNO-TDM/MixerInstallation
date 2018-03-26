@@ -49,6 +49,7 @@ echo "============================"
 echo "Update MixerInstallation files"
 echo "============================"
 cd /home/$mixer_user/$mixer_installation_folder
+git reset --hard
 git checkout $mixer_installation_branch
 git pull origin $mixer_installation_branch
 
@@ -57,6 +58,7 @@ echo "Update Payment Service"
 echo "==================================="s
 
 cd /home/$mixer_user/$payment_service_folder
+git reset --hard
 git checkout $payment_service_branch
 git pull origin $payment_service_branch
 mvn clean package
@@ -67,6 +69,7 @@ echo "==================================="
 echo "Update MixerControl"
 echo "==================================="
 cd /home/$mixer_user/$mixer_control_folder
+git reset --hard
 git checkout $mixer_control_branch
 git pull origin $mixer_control_branch
 
