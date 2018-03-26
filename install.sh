@@ -36,7 +36,8 @@ export NVM_DIR=$HOME/.nvm;
 source $HOME/.nvm/nvm.sh;
 nvm install 9.3.0
 npm install pm2 -g
-npm install pm2-logrotate -g
+pm2 install pm2-logrotate
+pm2 set pm2-logrotate:retain 10
 echo "Finished installing nvm, node, pm2"
 
 echo "============================"
