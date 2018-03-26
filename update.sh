@@ -74,7 +74,7 @@ cd /home/$mixer_user/$mixer_control_folder
 git reset --hard
 git checkout $mixer_control_branch
 git pull origin $mixer_control_branch
-
+cd /home/$mixer_user/$mixer_control_folder/MixerControl-app
 npm install
 npm install -g @angular/cli
 npm run build
