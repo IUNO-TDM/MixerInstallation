@@ -39,6 +39,8 @@ echo "============================"
 echo "Updating node, npm, pm2"
 echo "============================"
 
+export NVM_DIR=$HOME/.nvm;
+source $HOME/.nvm/nvm.sh;
 nvm install 9.9.0
 npm install -g npm
 npm install pm2 -g
