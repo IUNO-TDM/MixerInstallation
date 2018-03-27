@@ -5,3 +5,8 @@ You can start the installation by calling this on a freshly installed Raspbian S
 ```bash
 curl -s https://raw.githubusercontent.com/IUNO-TDM/MixerInstallation/master/install.sh |  bash -s
 ```
+
+You can update your installation once installed by:
+```bash
+curl -s https://raw.githubusercontent.com/IUNO-TDM/MixerInstallation/master/update.sh |  bash -s
+```
