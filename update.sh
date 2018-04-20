@@ -44,7 +44,7 @@ source $HOME/.nvm/nvm.sh;
 nvm install 9.9.0
 npm install -g npm
 npm install pm2 -g
-pm2 install pm2-logrotate
+pm2 install pm2-logrotate@2.2.0
 pm2 set pm2-logrotate:retain 10
 
 echo "============================"
