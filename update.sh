@@ -77,6 +77,7 @@ git pull origin $mixer_control_branch
 cd /home/$mixer_user/$mixer_control_folder/MixerControl-app
 npm install
 npm install -g @angular/cli
+rm -r dist
 npm run build
 
 echo "Finished installing MixerControl"
